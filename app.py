@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for
 from common.database import Database
-from utils.scheduler_utils import SchedulerUtils
+#from utils.scheduler_utils import SchedulerUtils
 import threading
 
 app = Flask(__name__)
@@ -8,8 +8,8 @@ app = Flask(__name__)
 @app.before_first_request
 def init_db():
     Database.initialize()
-    t = threading.Thread(target=SchedulerUtils.init_schedule)
-    t.start()
+    #t = threading.Thread(target=SchedulerUtils.init_schedule)
+    #t.start()
 
 
 @app.route('/')
@@ -23,4 +23,4 @@ app.register_blueprint(weight_blueprint, url_prefix='/weight')
 
 
 if __name__ == '__main__':
-    app.run(port=5003, host="192.168.2.3", threaded=True)
+    app.run(port=8080, host="0.0.0.0", threaded=True)
