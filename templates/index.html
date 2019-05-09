@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'modals.html' %}
+<div class="jumbotron mt-3" id="jumbotron_container">
+  <h1 class="display-4">Log today's weight</h1><br>
+  <div class="row justify-content-center">
+    <div class="col-lg-4 col-sm-6">
+      <input class="form-control" type="text" name="weight_input" placeholder="Enter today's weight"/>
+    </div>
+    <div class="col-lg-2 col-sm-2">
+      <select class="form-control" id="selected_unit">
+        <option value="kg">Kg</option>
+        <option value="lb">Lb</option>
+      </select>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-sm-6">
+      <br>
+      <button type="button" id="btn_submit" class="btn btn-primary btn-lg btn-block">Submit today's weight</button>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-sm-6">
+      <br>
+      <a href="{{url_for('weight.show_history')}}">Show history</a>
+    </div>
+  </div>
+  {% if last_week_avg %}
+    {% include 'week_avg_weight_template.html' %}
+  {% endif %}
+</div>
+<script>
+$(document).ready(function(){
+  $('#btn_submit').click(function(){
+    $.ajax({
+      type: 'POST',
+      url: '{{url_for('weight.register_weight')}}',
+      data: JSON.stringify({
+        todays_weight: $('input[name="weight_input"]').val(),
+        unit: $('#selected_unit option:selected').val()
+      }),
+      contentType: 'application/json',
+      dataType: 'json'
+    }).always(function(data){
+      if(data.error){
+        $('#error_modal').modal('show')
+        $('p#error').html(weight_data.error);
+        return false;
+      }
+      if(data.last_week_avg)
+        $('#week_avg').html("This week's average: " + data.last_week_avg + " " + data.unit)
+      $('p#weight').html(data.weight + " " + data.unit)
+      $('#weight_successfully_logged').modal('show');
+      $('#weight_successfully_logged').on('hidden.bs.modal', function (e) {
+        location.reload();
+      })
+    })
+  })
+})
+</script>
+{% endblock %}
